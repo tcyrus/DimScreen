@@ -8,6 +8,8 @@ namespace DimScreen
         // list of overlays currently displayed
         private System.Collections.Generic.List<frmMain> overlays = new System.Collections.Generic.List<frmMain>();
 
+        private ToolStripMenuItem lastMenuItem;
+
         public frmTray()
         {
             InitializeComponent();
@@ -115,7 +117,16 @@ namespace DimScreen
 
         private void numericMenus_Click(object sender, EventArgs e)
         {
-            var value = float.Parse((((ToolStripMenuItem)sender).Tag.ToString()));
+            var menuItem = (ToolStripMenuItem)sender;
+            
+            if (lastMenuItem != null)
+                lastMenuItem.Checked = false;
+
+            menuItem.Checked = true;
+
+            lastMenuItem = menuItem;
+
+            var value = float.Parse((menuItem.Tag.ToString()));
 
             foreach (frmMain form in overlays)
                 form.Dimness = value / 100;
@@ -130,7 +141,7 @@ namespace DimScreen
 
         private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
         {
-             contextMenuStrip1.Show();
+            contextMenuStrip1.Show();
         }
     }
 }
