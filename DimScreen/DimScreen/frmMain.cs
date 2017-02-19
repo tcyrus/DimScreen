@@ -44,21 +44,24 @@ namespace DimScreen
 			ColorKey = 0x1,
 			Alpha = 0x2
 		}
-#endregion
+        #endregion
 
 #region DLLImport
-		[DllImport("user32.dll", EntryPoint="GetWindowLong")]
-		public static extern int GetWindowLong(IntPtr hWnd, GWL nIndex);
+        internal static class NativeMethods
+        {
+            [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
+            public static extern int GetWindowLong(IntPtr hWnd, GWL nIndex);
 
-		[DllImport("user32.dll", EntryPoint="SetWindowLong")]
-		public static extern int SetWindowLong(IntPtr hWnd, GWL nIndex, int dwNewLong);
+            [DllImport("user32.dll", EntryPoint = "SetWindowLong")]
+            public static extern int SetWindowLong(IntPtr hWnd, GWL nIndex, int dwNewLong);
 
-		[DllImport("user32.dll", EntryPoint="SetLayeredWindowAttributes")]
-		public static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, LWA dwFlags);
+            [DllImport("user32.dll", EntryPoint = "SetLayeredWindowAttributes")]
+            public static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, LWA dwFlags);
+        }
 #endregion
 
 
-		protected override void OnShown(EventArgs e)
+        protected override void OnShown(EventArgs e)
 		{
 			base.OnShown(e);
 		}
@@ -87,18 +90,18 @@ namespace DimScreen
 		{
 			float calculatedValue = currentValue + Math.Sign(targetValue - currentValue) * 0.02f;
 
-			if (Math.Abs(targetValue - currentValue) < 0.02f * 2)
+			if (Math.Abs(targetValue - currentValue) < (0.02f * 2))
 			{
 				currentValue = targetValue;
 				timerPhase.Stop();
 			}
 
-			int wl = GetWindowLong(this.Handle, GWL.ExStyle);
+			int wl = NativeMethods.GetWindowLong(this.Handle, GWL.ExStyle);
 			wl = wl | 0x80000 | 0x20;
-			SetWindowLong(this.Handle, GWL.ExStyle, wl);
+            NativeMethods.SetWindowLong(this.Handle, GWL.ExStyle, wl);
 
 			byte value = (byte)(calculatedValue * 255);
-			SetLayeredWindowAttributes(this.Handle, 0x128, value, LWA.Alpha);
+            NativeMethods.SetLayeredWindowAttributes(this.Handle, 0x128, value, LWA.Alpha);
 
 			currentValue = calculatedValue;
 		}
